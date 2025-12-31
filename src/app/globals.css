@@ -1,0 +1,113 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+/* 1. Global Page Setup: Browser headers/footers ko hatane ke liye */
+@page {
+  size: A4;
+  margin: 0;
+  /* Isse default URL aur Title hat jayenge */
+}
+
+@media print {
+
+  /* 2. Har page par top/bottom space dene ke liye */
+  @page {
+    margin: 15mm 0mm 15mm 0mm;
+  }
+
+  body {
+    background-color: white !important;
+    -webkit-print-color-adjust: exact;
+    margin: 0;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .paper-container {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .a4-paper {
+    width: 210mm !important;
+    margin: 0 !important;
+    /* Side padding text alignment ke liye */
+    padding: 0mm 15mm !important;
+    box-shadow: none !important;
+  }
+
+  /* 3. Watermark: Fixed taaki har page par dikhe */
+  .watermark {
+    position: fixed !important;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    /* Center aur rotate */
+    z-index: -1;
+    opacity: 0.08;
+    /* Very faint print ke liye */
+  }
+
+  .watermark-text {
+    font-size: 100pt;
+    font-weight: 900;
+    color: black;
+    text-transform: uppercase;
+  }
+}
+
+/* 4. Screen Preview Setup */
+.a4-paper {
+  width: 210mm;
+  min-height: 297mm;
+  background: white;
+  margin: 20px auto;
+  padding: 20mm 15mm;
+  /* Screen par padding */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-45deg);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.05;
+  white-space: nowrap;
+}
+
+.mjx-container {
+  font-size: 100% !important;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* Custom scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
