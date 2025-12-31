@@ -1,0 +1,129 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']],
+          processEscapes: true,
+          packages: {'[+]': ['ams', 'base', 'extpfeil']}
+        },
+        options: {
+          enableMenu: false
+        },
+        svg: {
+          fontCache: 'global'
+        },
+        chtml: {
+          displayAlign: 'left',
+          displayIndent: '2em'
+        }
+      };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+   <style>
+  /* 1. Global Page Setup: Browser headers/footers ko hatane ke liye */
+  @page {
+    size: A4;
+    margin: 0; /* Isse default URL aur Title hat jayenge */
+  }
+
+  @media print {
+    /* 2. Har page par top/bottom space dene ke liye */
+    @page { 
+      margin: 15mm 0mm 15mm 0mm; 
+    }
+
+    body { 
+      background-color: white !important; 
+      -webkit-print-color-adjust: exact; 
+      margin: 0;
+    }
+    
+    .no-print { display: none !important; }
+    
+    .paper-container {
+      width: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    
+    .a4-paper {
+      width: 210mm !important;
+      margin: 0 !important;
+      /* Side padding text alignment ke liye */
+      padding: 0mm 15mm !important; 
+      box-shadow: none !important;
+    }
+
+    /* 3. Watermark: Fixed taaki har page par dikhe */
+    .watermark {
+      position: fixed !important;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-45deg); /* Center aur rotate */
+      z-index: -1;
+      opacity: 0.08; /* Very faint print ke liye */
+    }
+    
+    .watermark-text {
+      font-size: 100pt;
+      font-weight: 900;
+      color: black;
+      text-transform: uppercase;
+    }
+  }
+
+  /* 4. Screen Preview Setup */
+  .a4-paper {
+    width: 210mm;
+    min-height: 297mm;
+    background: white;
+    margin: 20px auto;
+    padding: 20mm 15mm; /* Screen par padding */
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .watermark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.05;
+    white-space: nowrap;
+  }
+
+  .mjx-container {
+    font-size: 100% !important;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body class="bg-slate-100 font-sans text-slate-900">
+    <div id="root"></div>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>

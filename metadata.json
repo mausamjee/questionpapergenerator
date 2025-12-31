@@ -1,0 +1,5 @@
+{
+  "name": "ExamCraft: Pro Question Paper Generator",
+  "description": "A sophisticated automated exam paper generator featuring LaTeX math rendering, image support, difficulty balancing, and blueprint-based randomization for board-standard question papers.",
+  "requestFramePermissions": []
+}
