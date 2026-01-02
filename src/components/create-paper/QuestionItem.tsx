@@ -21,15 +21,19 @@ export const QuestionItem: React.FC<QuestionItemProps> = ({
  const isShortOptions = q.options && q.options.every(o => o.replace(/<[^>]*>/g, '').length < 15);
 
  return (
-  <div className="page-break-avoid group relative pb-1 hover:bg-slate-50/80 transition-all rounded-xl pr-1 pl-1">
+  <div className="page-break-avoid group relative pb-1 hover:bg-slate-50/80 transition-all rounded-xl pr-1 pl-1 cursor-pointer">
    <button
-    onClick={onEdit}
-    className="absolute right-0 top-0 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 text-blue-600 bg-white shadow-xl border border-blue-100 rounded-xl no-print z-20"
+    onClick={(e) => {
+     e.stopPropagation();
+     onEdit();
+    }}
+    className="absolute right-2 top-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity p-1.5 text-white bg-blue-600 shadow-lg border border-blue-500 rounded-full no-print z-20 hover:bg-blue-700 hover:scale-110 transform duration-200"
+    title="Edit Question"
    >
-    <Edit className="w-3 h-3" />
+    <Edit className="w-3.5 h-3.5" />
    </button>
 
-   <div className="flex items-baseline" style={{ gap: '0.4em' }}>
+   <div className="flex items-baseline" style={{ gap: '0.4em' }} onClick={onEdit}>
     <span className="font-black shrink-0 text-[1em]">{label}</span>
     <div className="flex-1 min-w-0">
      {/* Question Content & Marks Row */}
