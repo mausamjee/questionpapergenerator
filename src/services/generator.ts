@@ -1,13 +1,12 @@
-
 import {
   Question,
   SectionType,
   Difficulty,
   GeneratedPaper,
   GenerationConfig,
-  PaperSection
+  PaperSection,
+  BlueprintRule
 } from '../types';
-import { fetchQuestionsByChapters } from './questionService';
 
 const getRandomInt = (max: number) => Math.floor(Math.random() * max);
 
@@ -33,10 +32,92 @@ export const getAlternativeQuestion = (currentQuestion: Question, pool: Question
 };
 
 export const generatePaper = (config: GenerationConfig, pool: Question[]): GeneratedPaper => {
-  const { totalMarks } = config;
+  const { totalMarks, blueprint: customBlueprint } = config;
 
+  // IMPORTANT: For Past Year Papers, we basically just want to show ALL fetched questions.
+  // The 'pool' already contains only the filtered questions.
+  // We can group them by type for display.
+  if (config.mode === 'past_year') {
+    // For Past Year, we create sections based on question types to keep it organized
+    const types = [SectionType.MCQ, SectionType.VSA, SectionType.SA_2, SectionType.SA_3, SectionType.LA_4];
+    const sections: PaperSection[] = [];
+
+    types.forEach(type => {
+      const typeQuestions = pool.filter(q => q.type === type);
+      if (typeQuestions.length > 0) {
+        sections.push({
+          name: `${type} Section`,
+          type: type,
+          description: `Questions from ${config.selectedYear}`,
+          marksPerQuestion: typeQuestions[0].marks || 1, // best guess or data
+          requiredCount: typeQuestions.length,
+          totalPoolCount: typeQuestions.length,
+          questions: typeQuestions
+        });
+      }
+    });
+
+    return {
+      id: `PAPER_${Date.now()}`,
+      title: config.headerTitle,
+      subject: config.subject,
+      date: config.testDate,
+      totalMarks: pool.reduce((sum, q) => sum + (q.marks || 0), 0),
+      timeAllowed: config.timeAllowed,
+      sections: sections
+    };
+  }
+
+  // --- GENERATOR A (CUSTOM BLUEPRINT) ---
+  if (customBlueprint && customBlueprint.length > 0) {
+    const paperSections: PaperSection[] = [];
+    const usedIds = new Set<string>();
+
+    customBlueprint.forEach(rule => {
+      // Filter pool based on Rule (Type AND Chapter if specified)
+      const rulePool = pool.filter(q => {
+        const typeMatch = q.type === rule.type;
+        const chapterMatch = rule.chapterFilter && rule.chapterFilter !== 'All'
+          ? q.chapter === rule.chapterFilter
+          : true;
+        return typeMatch && chapterMatch && !usedIds.has(q.id);
+      });
+
+      const countToPick = rule.requiredCount;
+      const picked: Question[] = [];
+      const s = shuffle(rulePool);
+
+      for (let i = 0; i < Math.min(countToPick, s.length); i++) {
+        picked.push({ ...s[i], marks: rule.marksPerQuestion });
+        usedIds.add(s[i].id);
+      }
+
+      paperSections.push({
+        name: rule.name,
+        type: rule.type,
+        description: `Attempt ${rule.requiredCount} questions.`,
+        marksPerQuestion: rule.marksPerQuestion,
+        requiredCount: rule.requiredCount,
+        totalPoolCount: picked.length,
+        questions: picked
+      });
+    });
+
+    return {
+      id: `PAPER_${Date.now()}`,
+      title: config.headerTitle,
+      subject: config.subject,
+      date: config.testDate,
+      totalMarks: config.totalMarks, // Or calculated from actual questions
+      timeAllowed: config.timeAllowed,
+      sections: paperSections
+    };
+  }
+
+  // --- GENERATOR B (LEGACY / DEFAULT BLUEPRIMT) ---
   if (pool.length < 5) {
-    throw new Error("Insufficient questions in selected chapters to generate a paper.");
+    // warning but proceed if we can? No, standard logic fails.
+    // throw new Error("Insufficient questions in selected chapters to generate a paper.");
   }
 
   const blueprint: Record<number, any[]> = {
@@ -67,7 +148,7 @@ export const generatePaper = (config: GenerationConfig, pool: Question[]): Gener
     ]
   };
 
-  const sectionsBlueprint = blueprint[totalMarks];
+  const sectionsBlueprint = blueprint[totalMarks] || blueprint[80];
   const paperSections: PaperSection[] = [];
   const usedIds = new Set<string>();
 
@@ -78,6 +159,7 @@ export const generatePaper = (config: GenerationConfig, pool: Question[]): Gener
     const picked: Question[] = [];
     const s = shuffle(secPool);
     for (let i = 0; i < Math.min(countToPick, s.length); i++) {
+      // if hardcoded marks in blueprint, use them, else keep original
       picked.push({ ...s[i], marks: secDef.marks });
       usedIds.add(s[i].id);
     }
@@ -90,6 +172,7 @@ export const generatePaper = (config: GenerationConfig, pool: Question[]): Gener
         const questions = pickQuestionsForBlueprint(sub);
         paperSections.push({
           name: sub.name,
+          type: sub.type.length === 1 ? sub.type[0] : undefined,
           description: sub.desc,
           marksPerQuestion: sub.marks,
           requiredCount: sub.req,
@@ -102,6 +185,7 @@ export const generatePaper = (config: GenerationConfig, pool: Question[]): Gener
       const questions = pickQuestionsForBlueprint(secDef);
       paperSections.push({
         name: secDef.name,
+        type: secDef.type.length === 1 ? secDef.type[0] : undefined,
         description: secDef.desc,
         marksPerQuestion: secDef.marks,
         requiredCount: secDef.req,
@@ -113,11 +197,11 @@ export const generatePaper = (config: GenerationConfig, pool: Question[]): Gener
 
   return {
     id: `PAPER_${Date.now()}`,
-    title: 'BOARD QUESTION PAPER : FEBRUARY 2025',
-    subject: 'MATHEMATICS AND STATISTICS',
-    date: 'FEBRUARY 2025',
-    totalMarks: totalMarks,
-    timeAllowed: totalMarks === 80 ? '3 Hrs.' : (totalMarks === 40 ? '2 Hrs.' : '1 Hr.'),
+    title: config.headerTitle,
+    subject: config.subject,
+    date: config.testDate,
+    totalMarks: config.totalMarks,
+    timeAllowed: config.timeAllowed,
     sections: paperSections
   };
 };

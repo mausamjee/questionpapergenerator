@@ -28,6 +28,7 @@ export interface Question {
 
 export interface PaperSection {
   name: string;
+  type?: SectionType;
   description: string;
   marksPerQuestion: number;
   requiredCount: number;
@@ -46,9 +47,21 @@ export interface GeneratedPaper {
   timeAllowed: string;
 }
 
+export interface BlueprintRule {
+  id: string;
+  name: string; // e.g. "Section A - MCQ"
+  type: SectionType;
+  requiredCount: number;
+  marksPerQuestion: number;
+  chapterFilter?: string; // "All" or specific chapter
+}
+
 export interface GenerationConfig {
+  mode: 'generator' | 'past_year';
+  class: string;
+  selectedYear?: string;
   selectedChapters: string[];
-  totalMarks: 20 | 40 | 80;
+  totalMarks: number;
   difficultyFocus: 'Standard' | 'Easy' | 'Challenging';
   headerTitle: string;
   subHeader: string;
@@ -63,4 +76,5 @@ export interface GenerationConfig {
   organizationName: string;
   showExamYear: boolean;
   fontSize: number;
+  blueprint: BlueprintRule[];
 }
