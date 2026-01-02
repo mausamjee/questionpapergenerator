@@ -180,10 +180,7 @@ export default function CreatePaperPage() {
       </div>
 
       {/* Sidebar - Responsive */}
-      <div className={`${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300 fixed md:static inset-0 z-40 md:z-auto`}>
-        <div className="md:hidden absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setIsSidebarOpen(false)} />
-        <Sidebar />
-      </div>
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
       <main className="flex-1 p-4 md:p-10 max-w-7xl mx-auto w-full overflow-x-hidden">
         {/* Top Navigation */}
